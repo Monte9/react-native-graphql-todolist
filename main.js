@@ -19,18 +19,21 @@ const SCREEN_WIDTH = Dimensions.get('window').width;
 const LIST = [
   {
     description: 'Buy groceries on my way home',
-    category: 'Home',
+    category: 'To-Do',
     notes: "Don't forget or wifey won't make you any dinner",
-  },
-  {
-    description: 'Finish React Native GraphQL Todo List App',
-    category: 'Projects',
-    notes: 'GraphQL is :fire:',
+    checked: true
   },
   {
     description: 'Release v3.1',
     category: 'Work',
     notes: 'Need to codepush it. QA it before release',
+    checked: true
+  },
+  {
+    description: 'Finish React Native GraphQL Todo List App',
+    category: 'Projects',
+    notes: 'GraphQL is :fire:',
+    checked: false
   },
 ]
 
@@ -134,8 +137,23 @@ class App extends React.Component {
     })
   }
 
+  handleOnSubmitEditing() {
+    const { addItemValue, addItemValueInFocus } = this.state
+
+    if(addItemValue.isEmpty) {
+      return this.setState({
+        addItemValue: nil,
+        addItemValueInFocus: false
+      })
+    } else {
+      return this.setState({
+        addItemValue, addItemValueInFocus: false
+      })
+    }
+  }
+
   render() {
-    const { checked, addItemValue, addItemValueInFocus } = this.state
+    const { addItemValue, addItemValueInFocus } = this.state
 
     console.log(this.state)
 
@@ -162,7 +180,7 @@ class App extends React.Component {
           <View style={styles.headerView}>
             <View style={styles.headerTextView}>
               <Text style={styles.headerTextViewTitle}>My Day</Text>
-              <Text style={styles.headerTextViewSubtitle}>Tuesday, May 16</Text>
+              <Text style={styles.headerTextViewSubtitle}>Wednesday, May 17</Text>
             </View>
           </View>
           <View style={styles.listView}>
@@ -173,10 +191,10 @@ class App extends React.Component {
                     key={index}
                     hideChevron
                     title={item.description}
-                    titleStyle={checked ? styles.itemCompleteTitle : styles.itemInCompleteTitle}
+                    titleStyle={item.checked ? styles.itemCompleteTitle : styles.itemInCompleteTitle}
                     subtitle={item.category}
-                    subtitleStyle={checked ? styles.itemCompleteSubtitle : styles.itemInCompleteSubtitle}
-                    leftIcon={checked ? this.itemCompleteIconStyle() : this.itemInCompleteIconStyle()}
+                    subtitleStyle={item.checked ? styles.itemCompleteSubtitle : styles.itemInCompleteSubtitle}
+                    leftIcon={item.checked ? this.itemCompleteIconStyle() : this.itemInCompleteIconStyle()}
                     onPress={this.onListItemPress.bind(this)}
                   />
                 ))
@@ -191,10 +209,10 @@ class App extends React.Component {
             </View>
             <View style={styles.addItemTextInputContainer}>
               <TextInput
-                style={{height: 40, fontSize: 18, fontWeight: '400'}}
+                style={styles.textInputStyle}
                 placeholder='Add a to-do'
                 onFocus={() => this.setState({addItemValueInFocus: true})}
-                onSubmitEditing={() => (addItemValue.isEmpty ? this.setState({addItemValue: nil, addItemValueInFocus: false}) : this.setState({addItemValue, addItemValueInFocus: false}))}
+                onSubmitEditing={this.handleOnSubmitEditing.bind(this)}
                 placeholderTextColor={addItemValueInFocus ? COLORS.subtitleGreyInComplete : COLORS.addItemIconNoValue}
                 onChangeText={(addItemValue) => this.setState({addItemValue})}
               />
@@ -231,7 +249,7 @@ const styles = StyleSheet.create({
     right: 18,
   },
   headerView: {
-    flex: 4,
+    flex: 5,
   },
   headerTextView: {
     position: 'absolute',
@@ -255,7 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(247,247, 250, 1)'
   },
   listContainerView: {
-    marginTop: -3
+    marginTop: -14
   },
   itemCompleteTitle: {
     fontSize: 17,
@@ -281,7 +299,9 @@ const styles = StyleSheet.create({
     height: 60,
     width: SCREEN_WIDTH,
     backgroundColor: 'white',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.addItemIconWithValue
   },
   addItemIconContainer: {
     flex: 1,
@@ -293,6 +313,11 @@ const styles = StyleSheet.create({
     flex: 10,
     justifyContent: 'center',
     paddingHorizontal: 10
+  },
+  textInputStyle: {
+    height: 40,
+    fontSize: 18,
+    fontWeight: '400'
   },
   submitItemIconContainer: {
     flex: 1,
