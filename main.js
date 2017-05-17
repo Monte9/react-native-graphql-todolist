@@ -1,6 +1,15 @@
 import Expo from 'expo';
 import React from 'react';
-import { StyleSheet, Text, View, Image, Dimensions } from 'react-native';
+import {
+  Text,
+  View,
+  Image,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  StyleSheet,
+  Dimensions
+} from 'react-native';
 
 import { Icon, List, ListItem } from 'react-native-elements'
 
@@ -31,7 +40,9 @@ const COLORS = {
   subtitleGreyInComplete: 'rgba(117, 117, 119, 1)',
   subtitleGreyComplete: 'rgba(172, 171, 173, 1)',
   checkmarkGreen: 'rgba(131, 175, 41, 1)',
-  checkmarkBlack: 'rgba(0, 0, 0, 1)'
+  checkmarkBlack: 'rgba(0, 0, 0, 1)',
+  addItemIconWithValue: 'rgba(193, 193, 193, 1)',
+  addItemIconNoValue: 'rgba(79, 94, 248, 1)'
 }
 
 class App extends React.Component {
@@ -39,7 +50,9 @@ class App extends React.Component {
     super();
 
     this.state = {
-      checked: false
+      checked: false,
+      addItemValue: '',
+      addItemValueInFocus: false
     }
   }
 
@@ -61,6 +74,58 @@ class App extends React.Component {
     }
   }
 
+  renderAddItemIcon() {
+    const { addItemValueInFocus } = this.state
+
+    if (addItemValueInFocus) {
+      return (
+        <Icon
+          name='ios-radio-button-off'
+          type='ionicon'
+          color={COLORS.addItemIconWithValue}
+          size={30}
+        />
+      )
+    } else {
+      return (
+        <Icon
+          name='md-add-circle'
+          type='ionicon'
+          color={COLORS.addItemIconNoValue}
+          size={30}
+        />
+      )
+    }
+  }
+
+  renderSubmitItemIcon() {
+    const { addItemValueInFocus, addItemValue } = this.state
+
+    if(!addItemValueInFocus) {
+      return null
+    } else if (addItemValue.length === 0) {
+      return (
+        <Icon
+          name='arrow-down-bold-hexagon-outline'
+          type='material-community'
+          color={COLORS.addItemIconWithValue}
+          size={30}
+          style={{transform: [{ rotate: '180deg'}]}}
+        />
+      )
+    } else if (addItemValueInFocus) {
+      return (
+        <Icon
+          name='arrow-down-bold-hexagon-outline'
+          type='material-community'
+          color={COLORS.addItemIconNoValue}
+          size={30}
+          style={{transform: [{ rotate: '180deg'}]}}
+        />
+      )
+    }
+  }
+
   onListItemPress() {
     const { checked } = this.state
 
@@ -70,60 +135,82 @@ class App extends React.Component {
   }
 
   render() {
-    const { checked } = this.state
+    const { checked, addItemValue, addItemValueInFocus } = this.state
+
+    console.log(this.state)
 
     return (
-      <View style={styles.container}>
+      <View style={styles.flexView}>
         <Image style={styles.bgImage} source={require('./src/images/top_wallpaper.png')} />
-        <View style={styles.headerView}>
-          <View style={styles.headerViewToggleIcon}>
-            <Icon
-              name='menu'
-              type='simple-line-icon'
-              color='white'
-              size={23}
-            />
-          </View>
-          <View style={styles.headerViewInfoView}>
-            <Icon
-              name='md-bulb'
-              type='ionicon'
-              color='white'
-              size={30}
-            />
-          </View>
-          <View style={styles.headerTextView}>
-            <Text style={styles.headerTextViewTitle}>My Day</Text>
-            <Text style={styles.headerTextViewSubtitle}>Tuesday, May 16</Text>
-          </View>
+        <View style={styles.headerViewToggleIcon}>
+          <Icon
+            name='menu'
+            type='simple-line-icon'
+            color='white'
+            size={23}
+          />
         </View>
-        <View style={styles.listView}>
-          <List containerStyle={styles.listContainerView}>
-            {
-              LIST.map((item, index) => (
-                <ListItem
-                  key={index}
-                  hideChevron
-                  title={item.description}
-                  titleStyle={checked ? styles.itemCompleteTitle : styles.itemInCompleteTitle}
-                  subtitle={item.category}
-                  subtitleStyle={checked ? styles.itemCompleteSubtitle : styles.itemInCompleteSubtitle}
-                  leftIcon={checked ? this.itemCompleteIconStyle() : this.itemInCompleteIconStyle()}
-                  onPress={this.onListItemPress.bind(this)}
-                />
-              ))
-            }
-          </List>
+        <View style={styles.headerViewInfoIcon}>
+          <Icon
+            name='md-bulb'
+            type='ionicon'
+            color='white'
+            size={30}
+          />
         </View>
-        <View style={styles.addNewItemView}>
-        </View>
+        <ScrollView style={styles.flexView} contentContainerStyle={styles.flexView}>
+          <View style={styles.headerView}>
+            <View style={styles.headerTextView}>
+              <Text style={styles.headerTextViewTitle}>My Day</Text>
+              <Text style={styles.headerTextViewSubtitle}>Tuesday, May 16</Text>
+            </View>
+          </View>
+          <View style={styles.listView}>
+            <List containerStyle={styles.listContainerView}>
+              {
+                LIST.map((item, index) => (
+                  <ListItem
+                    key={index}
+                    hideChevron
+                    title={item.description}
+                    titleStyle={checked ? styles.itemCompleteTitle : styles.itemInCompleteTitle}
+                    subtitle={item.category}
+                    subtitleStyle={checked ? styles.itemCompleteSubtitle : styles.itemInCompleteSubtitle}
+                    leftIcon={checked ? this.itemCompleteIconStyle() : this.itemInCompleteIconStyle()}
+                    onPress={this.onListItemPress.bind(this)}
+                  />
+                ))
+              }
+            </List>
+          </View>
+        </ScrollView>
+        <KeyboardAvoidingView behavior="padding">
+          <View style={styles.addNewItemContainerView}>
+            <View style={styles.addItemIconContainer}>
+              {this.renderAddItemIcon()}
+            </View>
+            <View style={styles.addItemTextInputContainer}>
+              <TextInput
+                style={{height: 40, fontSize: 18, fontWeight: '400'}}
+                placeholder='Add a to-do'
+                onFocus={() => this.setState({addItemValueInFocus: true})}
+                onSubmitEditing={() => (addItemValue.isEmpty ? this.setState({addItemValue: nil, addItemValueInFocus: false}) : this.setState({addItemValue, addItemValueInFocus: false}))}
+                placeholderTextColor={addItemValueInFocus ? COLORS.subtitleGreyInComplete : COLORS.addItemIconNoValue}
+                onChangeText={(addItemValue) => this.setState({addItemValue})}
+              />
+            </View>
+            <View style={styles.submitItemIconContainer}>
+              {this.renderSubmitItemIcon()}
+            </View>
+          </View>
+        </KeyboardAvoidingView>
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
+  flexView: {
     flex: 1
   },
   bgImage: {
@@ -133,18 +220,18 @@ const styles = StyleSheet.create({
     width: SCREEN_WIDTH,
     height: SCREEN_HEIGHT * 0.36,
   },
-  headerView: {
-    flex: 4,
-  },
   headerViewToggleIcon: {
     position: 'absolute',
     top: 35,
     left: 18,
   },
-  headerViewInfoView: {
+  headerViewInfoIcon: {
     position: 'absolute',
     top: 30,
     right: 18,
+  },
+  headerView: {
+    flex: 4,
   },
   headerTextView: {
     position: 'absolute',
@@ -190,14 +277,29 @@ const styles = StyleSheet.create({
     color: COLORS.subtitleGreyInComplete,
     fontWeight: '400'
   },
-  addNewItemView: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
+  addNewItemContainerView: {
     height: 60,
     width: SCREEN_WIDTH,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    flexDirection: 'row'
   },
+  addItemIconContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 15
+  },
+  addItemTextInputContainer: {
+    flex: 10,
+    justifyContent: 'center',
+    paddingHorizontal: 10
+  },
+  submitItemIconContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingRight: 15
+  }
 });
 
 Expo.registerRootComponent(App);
