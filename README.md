@@ -1,4 +1,4 @@
-![showcase image]('./splash_image.png')
+![showcase image](./splash_image.png)
 
 ## React  Native GraphQL Todo List App
 
