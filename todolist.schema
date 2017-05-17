@@ -1,0 +1,6 @@
+type Item {
+  id: ID!
+  description: String!
+  category: String!
+  notes: String
+}
