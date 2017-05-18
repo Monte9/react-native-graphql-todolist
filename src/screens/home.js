@@ -17,7 +17,7 @@ import { ListItem } from '../../rne-beta/ListItem';
 import ParallaxScrollView from '../../rne-beta/ParallaxScrollView';
 
 import { COLORS } from '../config/colors';
-import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../config/constants';
+import { SCREEN_WIDTH, SCREEN_HEIGHT, LIST } from '../config/constants';
 
 class Home extends Component {
   static propTypes = {
@@ -172,9 +172,9 @@ class Home extends Component {
 
     return (
       <List containerStyle={styles.listContainerView}>
-        {this.props.data.allItems.map((item, index) => (
+        {LIST.map((item, index) => (
           <ListItem
-            key={item.id}
+            key={index}
             hideChevron
             title={item.description}
             titleStyle={
@@ -209,18 +209,7 @@ class Home extends Component {
         <ParallaxScrollView
           backgroundSource={require('../images/top_wallpaper.png')}
           windowHeight={SCREEN_HEIGHT * 0.38}
-          header={(
-            <View>
-              <View style={styles.headerViewToggleIcon}>
-                <Icon name="menu" type="simple-line-icon" color="white" size={23} />
-              </View>
-              <View style={styles.headerViewInfoIcon}>
-                <Icon name="md-bulb" type="ionicon" color="white" size={30} />
-              </View>
-            </View>
-          )}
-        >
-          <View>
+          headerView={
             <View style={styles.headerView}>
               <View style={styles.headerTextView}>
                 <Text style={styles.headerTextViewTitle}>My Day</Text>
@@ -229,9 +218,10 @@ class Home extends Component {
                 </Text>
               </View>
             </View>
-            <View style={styles.listView}>
-              {this.renderTodoListContent()}
-            </View>
+          }
+        >
+          <View style={styles.listView}>
+            {this.renderTodoListContent()}
           </View>
         </ParallaxScrollView>
         <KeyboardAvoidingView behavior="padding">
