@@ -10,9 +10,10 @@ import {
 } from 'react-native';
 
 import { graphql } from 'react-apollo';
-import { Icon, List, ListItem } from 'react-native-elements';
+import { Icon, List } from 'react-native-elements';
 import gql from 'graphql-tag';
 
+import { ListItem } from '../../rne-beta/ListItem';
 import { COLORS } from '../config/colors';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, LIST } from '../config/constants';
 
@@ -105,7 +106,7 @@ class Home extends Component {
     }
   }
 
-  onListItemPress() {
+  onListItemPress(item) {
     const { checked } = this.state;
     const { navigation } = this.props;
 
@@ -113,7 +114,7 @@ class Home extends Component {
       checked: !checked
     });
 
-    navigation.navigate('ItemDetail');
+    navigation.navigate('ItemDetail', item);
   }
 
   handleOnSubmitEditing() {
@@ -134,11 +135,8 @@ class Home extends Component {
 
   renderTodoListContent() {
     if (this.props.data.error) {
-      console.log(this.props.data.error);
       return (<Text style={{fontSize: 50}}>An unexpected error occurred</Text>);
     }
-
-    console.log(this.props.data);
 
     if (this.props.data.loading || !this.props.data.allItems) {
       return (<Text style={{fontSize: 50}}>Loading</Text>);
@@ -148,7 +146,7 @@ class Home extends Component {
       <List containerStyle={styles.listContainerView}>
         {this.props.data.allItems.map((item, index) => (
           <ListItem
-            key={index}
+            key={item.id}
             hideChevron
             title={item.description}
             titleStyle={
@@ -167,7 +165,8 @@ class Home extends Component {
                 ? this.itemCompleteIconStyle()
                 : this.itemInCompleteIconStyle()
             }
-            onPress={this.onListItemPress.bind(this)}
+            leftIconOnPress={() => console.log('Left Icon pressed')}
+            onPress={this.onListItemPress.bind(this, item)}
           />
         ))}
       </List>
