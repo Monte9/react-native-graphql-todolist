@@ -11,7 +11,7 @@ import Detail from './src/screens/detail';
 
 const client = new ApolloClient({
   networkInterface: createNetworkInterface({
-    uri: 'https://api.graph.cool/simple/v1/cj2sggzz385xb01604yo6g0r2'
+    uri: 'https://api.graph.cool/simple/v1/cj2ohlf4r7f9f01033a5hd0wd'
   })
 });
 

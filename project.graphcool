@@ -1,5 +1,5 @@
-# project: cj2sggzz385xb01604yo6g0r2
-# version: 1
+# projectId: cj2ohlf4r7f9f01033a5hd0wd
+# version: 10
 
 type File implements Node {
   contentType: String!
@@ -12,12 +12,18 @@ type File implements Node {
   url: String! @isUnique
 }
 
+type Item implements Node {
+  id: ID! @isUnique
+  description: String!
+  category: String
+  notes: String
+  checked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
 type User implements Node {
   createdAt: DateTime!
   id: ID! @isUnique
   updatedAt: DateTime!
 }
-
-# type Tweet {
-#   text: String!
-# }

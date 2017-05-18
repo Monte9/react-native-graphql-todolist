@@ -9,12 +9,22 @@ import {
   StyleSheet
 } from 'react-native';
 
+import { graphql } from 'react-apollo';
 import { Icon, List, ListItem } from 'react-native-elements';
+import gql from 'graphql-tag';
 
 import { COLORS } from '../config/colors';
 import { SCREEN_WIDTH, SCREEN_HEIGHT, LIST } from '../config/constants';
 
-export default class Home extends Component {
+class Home extends Component {
+  static propTypes = {
+    data: React.PropTypes.shape({
+      loading: React.PropTypes.bool,
+      error: React.PropTypes.object,
+      allItems: React.PropTypes.array
+    }).isRequired
+  };
+
   constructor() {
     super();
 
@@ -122,6 +132,48 @@ export default class Home extends Component {
     }
   }
 
+  renderTodoListContent() {
+    if (this.props.data.error) {
+      console.log(this.props.data.error);
+      return (<Text style={{fontSize: 50}}>An unexpected error occurred</Text>);
+    }
+
+    console.log(this.props.data);
+
+    if (this.props.data.loading || !this.props.data.allItems) {
+      return (<Text style={{fontSize: 50}}>Loading</Text>);
+    }
+
+    return (
+      <List containerStyle={styles.listContainerView}>
+        {this.props.data.allItems.map((item, index) => (
+          <ListItem
+            key={index}
+            hideChevron
+            title={item.description}
+            titleStyle={
+              item.checked
+                ? styles.itemCompleteTitle
+                : styles.itemInCompleteTitle
+            }
+            subtitle={item.category}
+            subtitleStyle={
+              item.checked
+                ? styles.itemCompleteSubtitle
+                : styles.itemInCompleteSubtitle
+            }
+            leftIcon={
+              item.checked
+                ? this.itemCompleteIconStyle()
+                : this.itemInCompleteIconStyle()
+            }
+            onPress={this.onListItemPress.bind(this)}
+          />
+        ))}
+      </List>
+    );
+  }
+
   render() {
     const { addItemValueInFocus } = this.state;
 
@@ -150,32 +202,7 @@ export default class Home extends Component {
             </View>
           </View>
           <View style={styles.listView}>
-            <List containerStyle={styles.listContainerView}>
-              {LIST.map((item, index) => (
-                <ListItem
-                  key={index}
-                  hideChevron
-                  title={item.description}
-                  titleStyle={
-                    item.checked
-                      ? styles.itemCompleteTitle
-                      : styles.itemInCompleteTitle
-                  }
-                  subtitle={item.category}
-                  subtitleStyle={
-                    item.checked
-                      ? styles.itemCompleteSubtitle
-                      : styles.itemInCompleteSubtitle
-                  }
-                  leftIcon={
-                    item.checked
-                      ? this.itemCompleteIconStyle()
-                      : this.itemInCompleteIconStyle()
-                  }
-                  onPress={this.onListItemPress.bind(this)}
-                />
-              ))}
-            </List>
+            {this.renderTodoListContent()}
           </View>
         </ScrollView>
         <KeyboardAvoidingView behavior="padding">
@@ -306,3 +333,17 @@ const styles = StyleSheet.create({
     paddingRight: 15
   }
 });
+
+const ItemsQuery = gql`query items {
+  allItems {
+		id
+    description
+    checked
+    category
+    notes
+  }
+}`;
+
+const HomeWithData = graphql(ItemsQuery)(Home);
+
+export default HomeWithData;
