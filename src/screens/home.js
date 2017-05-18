@@ -14,6 +14,8 @@ import { Icon, List } from 'react-native-elements';
 import gql from 'graphql-tag';
 
 import { ListItem } from '../../rne-beta/ListItem';
+import ParallaxScrollView from '../../rne-beta/ParallaxScrollView';
+
 import { COLORS } from '../config/colors';
 import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../config/constants';
 
@@ -204,32 +206,34 @@ class Home extends Component {
 
     return (
       <View style={styles.flexView}>
-        <Image
-          style={styles.bgImage}
-          source={require('../images/top_wallpaper.png')}
-        />
-        <View style={styles.headerViewToggleIcon}>
-          <Icon name="menu" type="simple-line-icon" color="white" size={23} />
-        </View>
-        <View style={styles.headerViewInfoIcon}>
-          <Icon name="md-bulb" type="ionicon" color="white" size={30} />
-        </View>
-        <ScrollView
-          style={styles.flexView}
-          contentContainerStyle={styles.flexView}
+        <ParallaxScrollView
+          backgroundSource={require('../images/top_wallpaper.png')}
+          windowHeight={SCREEN_HEIGHT * 0.38}
+          header={(
+            <View>
+              <View style={styles.headerViewToggleIcon}>
+                <Icon name="menu" type="simple-line-icon" color="white" size={23} />
+              </View>
+              <View style={styles.headerViewInfoIcon}>
+                <Icon name="md-bulb" type="ionicon" color="white" size={30} />
+              </View>
+            </View>
+          )}
         >
-          <View style={styles.headerView}>
-            <View style={styles.headerTextView}>
-              <Text style={styles.headerTextViewTitle}>My Day</Text>
-              <Text style={styles.headerTextViewSubtitle}>
-                Wednesday, May 17
-              </Text>
+          <View>
+            <View style={styles.headerView}>
+              <View style={styles.headerTextView}>
+                <Text style={styles.headerTextViewTitle}>My Day</Text>
+                <Text style={styles.headerTextViewSubtitle}>
+                  Wednesday, May 17
+                </Text>
+              </View>
+            </View>
+            <View style={styles.listView}>
+              {this.renderTodoListContent()}
             </View>
           </View>
-          <View style={styles.listView}>
-            {this.renderTodoListContent()}
-          </View>
-        </ScrollView>
+        </ParallaxScrollView>
         <KeyboardAvoidingView behavior="padding">
           <View style={styles.addNewItemContainerView}>
             <View style={styles.addItemIconContainer}>
