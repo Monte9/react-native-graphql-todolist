@@ -15,7 +15,7 @@ import gql from 'graphql-tag';
 
 import { ListItem } from '../../rne-beta/ListItem';
 import { COLORS } from '../config/colors';
-import { SCREEN_WIDTH, SCREEN_HEIGHT, LIST } from '../config/constants';
+import { SCREEN_WIDTH, SCREEN_HEIGHT } from '../config/constants';
 
 class Home extends Component {
   static propTypes = {
@@ -23,14 +23,14 @@ class Home extends Component {
       loading: React.PropTypes.bool,
       error: React.PropTypes.object,
       allItems: React.PropTypes.array
-    }).isRequired
+    }).isRequired,
+    updateItem: React.PropTypes.func.isRequired
   };
 
   constructor() {
     super();
 
     this.state = {
-      checked: false,
       addItemValue: '',
       addItemValueInFocus: false
     };
@@ -133,13 +133,39 @@ class Home extends Component {
     }
   }
 
+  handleUpdate = async item => {
+    await this.props.updateItem({
+      variables: {
+        id: item.id,
+        description: item.description,
+        checked: !item.checked,
+        category: item.category,
+        notes: item.notes
+      }
+    });
+  };
+
   renderTodoListContent() {
     if (this.props.data.error) {
-      return (<Text style={{fontSize: 50}}>An unexpected error occurred</Text>);
+      return (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text style={{ fontSize: 18, textAlign: 'center' }}>
+            An unexpected error occurred. Please try again!
+          </Text>
+        </View>
+      );
     }
 
     if (this.props.data.loading || !this.props.data.allItems) {
-      return (<Text style={{fontSize: 50}}>Loading</Text>);
+      return (
+        <View
+          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        >
+          <Text style={{ fontSize: 18 }}>Loading...</Text>
+        </View>
+      );
     }
 
     return (
@@ -165,7 +191,7 @@ class Home extends Component {
                 ? this.itemCompleteIconStyle()
                 : this.itemInCompleteIconStyle()
             }
-            leftIconOnPress={() => console.log('Left Icon pressed')}
+            leftIconOnPress={this.handleUpdate.bind(this, item)}
             onPress={this.onListItemPress.bind(this, item)}
           />
         ))}
@@ -242,7 +268,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT * 0.36
+    height: SCREEN_HEIGHT * 0.38
   },
   headerViewToggleIcon: {
     position: 'absolute',
@@ -279,7 +305,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(247,247, 250, 1)'
   },
   listContainerView: {
-    marginTop: -14
+    marginTop: 0
   },
   itemCompleteTitle: {
     fontSize: 17,
@@ -343,6 +369,20 @@ const ItemsQuery = gql`query items {
   }
 }`;
 
-const HomeWithData = graphql(ItemsQuery)(Home);
+const updateItem = gql`
+  mutation updateItem($id: ID!, $description: String!, $checked: Boolean!, $category: String, $notes: String) {
+    updateItem(id: $id, description: $description, checked: $checked, category: $category, notes: $notes) {
+      id
+      description
+      checked
+      category
+      notes
+    }
+  }
+`;
+
+const HomeWithData = graphql(ItemsQuery)(
+  graphql(updateItem, { name: 'updateItem' })(Home)
+);
 
 export default HomeWithData;
