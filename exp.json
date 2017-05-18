@@ -1,6 +1,6 @@
 {
   "name": "react-native-graphql-todolist",
-  "description": "An empty new project",
+  "description": "React Native Todo List app using GraphQL & Apollo",
   "slug": "react-native-graphql-todolist",
   "privacy": "public",
   "sdkVersion": "16.0.0",
